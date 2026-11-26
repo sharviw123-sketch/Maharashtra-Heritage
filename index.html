@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Maharashtra Heritage: explore the Bhuleswar Temple, Sangameshwar Temple and Bhaja Caves through the lens of Indian Knowledge Systems, and test yourself with interactive quizzes.">
+  <meta name="theme-color" content="#0d0b08">
+  <title>Maharashtra Heritage</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=EB+Garamond:wght@400;500&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to main content</a>
+
+<!-- Loading screen -->
+<div id="loading" aria-hidden="true">
+  <div class="loading-logo">Maharashtra Heritage</div>
+  <div class="loading-bar-wrap"><div class="loading-bar"></div></div>
+</div>
+
+<!-- Announces page changes to screen readers -->
+<p id="route-announcer" class="sr-only" aria-live="polite"></p>
+
+<!-- ═════════ HEADER / NAVIGATION ═════════ -->
+<header>
+  <nav id="main-nav" aria-label="Main navigation">
+    <a class="nav-logo" href="#/home">Maharashtra Heritage</a>
+
+    <button class="nav-toggle" id="nav-toggle" type="button"
+            aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">☰</button>
+
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#/home" data-page="home">Home</a></li>
+      <li><a href="#/iks" data-page="iks">IKS</a></li>
+      <li><a href="#/about" data-page="about">About</a></li>
+      <li><a href="#/quizzes" data-page="quizzes">Quizzes</a></li>
+    </ul>
+
+    <div class="nav-auth" id="nav-auth">
+      <button class="nav-auth-btn" id="nav-login-btn" type="button">Login / Sign Up</button>
+    </div>
+    <div class="nav-user-info" id="nav-user-info" hidden>
+      <span class="nav-user-name" id="nav-user-name"></span>
+      <button class="nav-user-btn" id="nav-scores-btn" type="button">My Scores</button>
+      <button class="nav-user-btn" id="nav-logout-btn" type="button">Logout</button>
+    </div>
+  </nav>
+</header>
+
+<!-- ═════════ AUTH MODAL ═════════ -->
+<div class="auth-modal-backdrop" id="auth-modal-backdrop">
+  <div class="auth-modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+    <button class="auth-modal-close" id="auth-close" type="button" aria-label="Close dialog">✕</button>
+    <p class="auth-modal-logo">Maharashtra Heritage</p>
+    <h2 class="auth-modal-title" id="auth-modal-title">Welcome Back</h2>
+
+    <form class="auth-form active" id="auth-login-form" novalidate>
+      <div class="auth-field">
+        <label for="login-email">Email address</label>
+        <input type="email" id="login-email" name="email" placeholder="your@email.com" autocomplete="email" required>
+      </div>
+      <div class="auth-field">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+      </div>
+      <p class="auth-message" id="login-message" role="alert"></p>
+      <button class="auth-submit-btn" type="submit">Login</button>
+    </form>
+
+    <form class="auth-form" id="auth-signup-form" novalidate>
+      <div class="auth-field">
+        <label for="signup-name">Full name</label>
+        <input type="text" id="signup-name" name="name" placeholder="Your name" autocomplete="name" required>
+      </div>
+      <div class="auth-field">
+        <label for="signup-email">Email address</label>
+        <input type="email" id="signup-email" name="email" placeholder="your@email.com" autocomplete="email" required>
+      </div>
+      <div class="auth-field">
+        <label for="signup-password">Password</label>
+        <input type="password" id="signup-password" name="password" placeholder="Create a password (min 6 characters)" autocomplete="new-password" minlength="6" required>
+      </div>
+      <p class="auth-message" id="signup-message" role="alert"></p>
+      <button class="auth-submit-btn" type="submit">Create Account</button>
+    </form>
+
+    <p class="auth-toggle" id="auth-toggle-login">
+      Don't have an account? <button type="button" id="go-signup">Sign up</button>
+    </p>
+    <p class="auth-toggle" id="auth-toggle-signup" hidden>
+      Already have an account? <button type="button" id="go-login">Login</button>
+    </p>
+  </div>
+</div>
+
+<!-- ═════════ SCORES MODAL ═════════ -->
+<div class="scores-modal-backdrop" id="scores-modal-backdrop">
+  <div class="scores-modal" role="dialog" aria-modal="true" aria-labelledby="scores-modal-username">
+    <button class="scores-modal-close" id="scores-close" type="button" aria-label="Close dialog">✕</button>
+    <p class="auth-modal-logo">My Profile</p>
+    <h2 class="auth-modal-title" id="scores-modal-username">Quiz History</h2>
+    <div class="scores-list" id="scores-list"></div>
+    <button class="scores-clear" id="scores-clear" type="button" hidden>Clear my history</button>
+  </div>
+</div>
+
+<!-- ═════════════════════════════════════════════
+     MAIN CONTENT — each "page" is a <div class="page">
+     shown or hidden by js/main.js (hash routing)
+═════════════════════════════════════════════ -->
+<main id="main" tabindex="-1">
+
+  <!-- ═════════ HOME ═════════ -->
+  <div id="page-home" class="page active" data-title="Home">
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-bg" role="presentation"></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="hero-eyebrow">Preserving the Sacred Legacy</p>
+        <h1 class="hero-title" id="hero-title" tabindex="-1">Maharashtra<br><em>Heritage</em></h1>
+        <p class="hero-subtitle">Temples, Caves &amp; Living Knowledge of Ancient Bharat</p>
+        <button class="hero-cta" type="button" data-scroll-to="structures">Explore Structures ↓</button>
+      </div>
+      <div class="hero-scroll" aria-hidden="true">
+        <div class="hero-scroll-line"></div>
+        SCROLL
+      </div>
+    </section>
+
+    <section id="structures" class="home-section reveal" aria-labelledby="structures-title">
+      <p class="section-label">Sacred Structures</p>
+      <h2 class="section-title" id="structures-title">Temples of<br><em>Eternal Stone</em></h2>
+      <p class="section-body">Three extraordinary monuments that carry within their carved walls the philosophical, spiritual, and artistic genius of ancient Maharashtra.</p>
+
+      <div class="structures-grid">
+        <a class="structure-card" href="#/bhuleswar">
+          <img src="images/bhuleshwar.jpg" alt="Black basalt walls and towers of the Bhuleswar Temple against a blue sky" loading="lazy">
+          <div class="structure-card-overlay">
+            <p class="structure-card-label">Hemadpanthi · Yavat</p>
+            <h3 class="structure-card-title">Bhuleswar Temple</h3>
+            <p class="structure-card-sub">12th–13th century CE</p>
+            <span class="btn-small">Explore Temple →</span>
+          </div>
+        </a>
+        <a class="structure-card" href="#/sangameshwar">
+          <img src="images/sangameshwar.jpg" alt="Sandstone shikhara and mandapa of the Sangameshwar Temple at Saswad" loading="lazy">
+          <div class="structure-card-overlay">
+            <p class="structure-card-label">Hemadpanthi · Saswad</p>
+            <h3 class="structure-card-title">Sangameshwar Temple</h3>
+            <p class="structure-card-sub">13th century CE</p>
+            <span class="btn-small">Explore Temple →</span>
+          </div>
+        </a>
+        <a class="structure-card" href="#/bhaja">
+          <img src="images/bhajacaves.jpg" alt="Rock-cut cave facades carved into a cliff at Bhaja" loading="lazy">
+          <div class="structure-card-overlay">
+            <p class="structure-card-label">Rock-cut · Malavli</p>
+            <h3 class="structure-card-title">Bhaja Caves</h3>
+            <p class="structure-card-sub">2nd century BCE</p>
+            <span class="btn-small">Explore Caves →</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <div class="divider" role="presentation"></div>
+
+    <section class="iks-section reveal" aria-labelledby="iks-preview-title">
+      <div class="iks-inner">
+        <div class="iks-visual">
+          <img class="iks-img-main" src="images/iks-main.jpg" alt="A long colonnaded stone corridor in a Maharashtra temple" loading="lazy">
+        </div>
+        <div>
+          <p class="section-label">IKS</p>
+          <h2 class="section-title" id="iks-preview-title">Connection to Indian<br><em>Knowledge Systems</em></h2>
+          <p class="section-body">These monuments are not merely architectural achievements — they are embodied texts. Every carved panel, every spatial proportion, every astronomical alignment encodes the living wisdom of Bharatiya Jnaana Parampara.</p>
+
+          <ul class="iks-cards" aria-label="Knowledge traditions">
+            <li class="iks-card">
+              <div class="iks-card-icon" aria-hidden="true">🏗</div>
+              <h3 class="iks-card-title">Vastu Shastra</h3>
+              <p class="iks-card-text">Sacred proportional systems governing temple spatial order</p>
+            </li>
+            <li class="iks-card">
+              <div class="iks-card-icon" aria-hidden="true">🌿</div>
+              <h3 class="iks-card-title">Agama Vidya</h3>
+              <p class="iks-card-text">Ritual knowledge encoded in iconographic programmes</p>
+            </li>
+            <li class="iks-card">
+              <div class="iks-card-icon" aria-hidden="true">⭐</div>
+              <h3 class="iks-card-title">Jyotisha</h3>
+              <p class="iks-card-text">Astronomical orientations built into shrine alignments</p>
+            </li>
+            <li class="iks-card">
+              <div class="iks-card-icon" aria-hidden="true">🎭</div>
+              <h3 class="iks-card-title">Shilpa Shastra</h3>
+              <p class="iks-card-text">Canonical craftsman treatises on stone carving grammar</p>
+            </li>
+          </ul>
+
+          <p class="button-row spaced"><a class="btn-small" href="#/iks">Learn More About IKS →</a></p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider" role="presentation"></div>
+
+    <section class="home-section reveal" aria-labelledby="about-preview-title">
+      <div class="about-preview">
+        <div>
+          <p class="section-label">About the Project</p>
+          <h2 class="section-title" id="about-preview-title">Preserving <em>Digital Sovereignty</em> of Our Heritage</h2>
+          <p class="section-body">We are dedicated to documenting and sharing rich cultural heritage through the lens of Indian Knowledge Systems. Our platform brings together history, architecture, philosophy, and technology to preserve the cultural legacy of Maharashtra.</p>
+          <div class="button-row spaced">
+            <a class="btn-primary" href="#/about">Our Mission</a>
+            <a class="btn-outline" href="#/quizzes">Take a Quiz</a>
+          </div>
+        </div>
+        <ul class="sovereignty-grid" aria-label="Our four pillars">
+          <li class="sovereignty-item">
+            <img src="images/documentation.jpg" alt="A richly carved Hemadpanthi temple, photographed for documentation" loading="lazy">
+            <div class="sovereignty-item-content">
+              <p class="sovereignty-item-num">01</p>
+              <h3 class="sovereignty-item-title">Documentation</h3>
+            </div>
+          </li>
+          <li class="sovereignty-item">
+            <img src="images/education.jpg" alt="Inscribed wooden writing boards and a stylus" loading="lazy">
+            <div class="sovereignty-item-content">
+              <p class="sovereignty-item-num">02</p>
+              <h3 class="sovereignty-item-title">Education</h3>
+            </div>
+          </li>
+          <li class="sovereignty-item">
+            <img src="images/preservation.jpg" alt="Carved stone pillars inside a temple hall" loading="lazy">
+            <div class="sovereignty-item-content">
+              <p class="sovereignty-item-num">03</p>
+              <h3 class="sovereignty-item-title">Preservation</h3>
+            </div>
+          </li>
+          <li class="sovereignty-item">
+            <img src="images/community.jpg" alt="A hill fort wall winding along a ridge at sunset" loading="lazy">
+            <div class="sovereignty-item-content">
+              <p class="sovereignty-item-num">04</p>
+              <h3 class="sovereignty-item-title">Community</h3>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="quiz-cta-section reveal" aria-labelledby="quiz-cta-title">
+      <div class="quiz-cta-inner">
+        <p class="section-label" style="justify-content:center;">Test Your Knowledge</p>
+        <h2 class="quiz-cta-title" id="quiz-cta-title">Let's Test Your<br><em>Knowledge!</em></h2>
+        <p class="quiz-cta-sub">Dive deep into the stone-carved wisdom of Maharashtra's sacred temples through our curated quizzes.</p>
+        <a class="btn-primary" href="#/quizzes">Begin Assessment →</a>
+      </div>
+    </section>
+
+    <section class="home-section reveal" aria-labelledby="effort-title">
+      <p class="section-label">What We Do</p>
+      <h2 class="section-title" id="effort-title">The Archival<br><em>Effort</em></h2>
+      <ul class="effort-grid">
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">📷</div>
+          <h3 class="effort-card-title">Photography</h3>
+          <p class="effort-card-text">High-resolution documentation of every carved surface and architectural element</p>
+        </li>
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">🗺</div>
+          <h3 class="effort-card-title">Mapping</h3>
+          <p class="effort-card-text">Precise architectural surveys and plan drawings with iconographic annotations</p>
+        </li>
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">📚</div>
+          <h3 class="effort-card-title">Research</h3>
+          <p class="effort-card-text">Connecting stone inscriptions and sculptural themes to textual knowledge traditions</p>
+        </li>
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">🎓</div>
+          <h3 class="effort-card-title">Education</h3>
+          <p class="effort-card-text">Interactive digital tools, quizzes, and learning experiences for all ages</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- ═════════ BHULESWAR ═════════ -->
+  <article id="page-bhuleswar" class="page" data-title="Bhuleswar Temple">
+    <header class="temple-hero">
+      <div class="temple-hero-bg" role="presentation" style="background-image:url('images/bhuleshwar.jpg');"></div>
+      <div class="temple-hero-overlay"></div>
+      <div class="temple-hero-content">
+        <a class="back-btn" href="#/home">Back to Home</a>
+        <p class="temple-category">Hemadpanthi · Yavat, Pune District</p>
+        <h1 class="temple-name" tabindex="-1">Bhuleswar<br><em>Temple</em></h1>
+        <p class="temple-tagline">The Hilltop Fortress of Shiva, Where Stone Speaks of Eternity</p>
+      </div>
+    </header>
+
+    <div class="temple-body">
+      <dl class="temple-facts" aria-label="Key facts">
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Constructed</dt>
+          <dd class="temple-fact-value">12th–13th C<span class="temple-fact-sub" style="display:block">Medieval period CE</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Style</dt>
+          <dd class="temple-fact-value">Hemadpanthi<span class="temple-fact-sub" style="display:block">Stone interlocking</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Primary Deity</dt>
+          <dd class="temple-fact-value">Bhuleshwar<span class="temple-fact-sub" style="display:block">Form of Shiva</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Location</dt>
+          <dd class="temple-fact-value">Yavat<span class="temple-fact-sub" style="display:block">Pune District, MH</span></dd>
+        </div>
+      </dl>
+
+      <div class="temple-content-grid">
+        <div class="temple-content-text">
+          <h2>History &amp; Origins</h2>
+          <p>Perched dramatically on a hilltop near Yavat in Pune district, the Bhuleswar Temple is one of the most impressive examples of Hemadpanthi architecture in Maharashtra. The temple is dedicated to Bhuleshwar — the Lord of the Earth — a rare and significant form of Shiva.</p>
+          <p>Built during the 12th–13th centuries CE, the temple was constructed using the distinctive Hemadpanthi method attributed to Hemadri, the able prime minister of the Yadava dynasty. This technique uses precisely cut black basalt stones interlocked without mortar, a testament to extraordinary engineering precision.</p>
+
+          <blockquote class="temple-highlight-box">
+            <p>"The Hemadpanthi method is a masterclass in structural engineering — stones so perfectly fitted that not even a blade of grass can be inserted between them."</p>
+          </blockquote>
+
+          <h2>Architectural Features</h2>
+          <p>The temple complex is enclosed within a massive fortified wall, giving it the appearance of a hilltop fort. The main shrine features a tall shikhara (tower) of the Nagara style, decorated with intricate carvings of deities, apsaras (celestial dancers), vyalas (mythical creatures), and floral motifs.</p>
+          <p>The outer walls are adorned with a continuous frieze of carvings that include processions of elephants at the base (symbolising earth and stability), followed by horses, scrolling foliage, scenes from the epics, and finally the divine figures in the upper registers — a vertical cosmogram ascending from earth to heaven.</p>
+
+          <h2>IKS Connections</h2>
+          <p>The temple's orientation and iconographic programme follow the Shaiva Agamas precisely. The Vastu Purusha Mandala governs the ground plan, while the sculptural programme encodes the Shaiva cosmological framework — the progression of tattvas (cosmic principles) from gross matter to pure consciousness.</p>
+          <p>Notably, the temple was also a centre for the Natha Panth tradition, with carvings showing Natha yogis in meditation postures — a living connection between the temple institution and the embodied knowledge practices of yogic lineages.</p>
+        </div>
+
+        <figure class="temple-gallery" data-gallery>
+          <img class="temple-gallery-main" src="images/bhuleshwar1.jpg" alt="Tiered shikhara of the Bhuleswar Temple seen from below" loading="lazy">
+          <div class="temple-gallery-row">
+            <button type="button" aria-label="Show this photo larger: pillared hall interior" aria-pressed="false"><img src="images/bhuleshwar2.jpg" alt="Pillared hall interior with carved columns" loading="lazy"></button>
+            <button type="button" aria-label="Show this photo larger: Nandi bull garlanded with flowers" aria-pressed="false"><img src="images/bhuleshwar3.jpg" alt="Nandi bull statue garlanded with flowers" loading="lazy"></button>
+          </div>
+          <figcaption class="temple-gallery-caption">Select a thumbnail to swap it into the main view.</figcaption>
+        </figure>
+      </div>
+
+      <div class="temple-nav-btns">
+        <a class="btn-primary" href="#/quiz/bhuleswar">Take Bhuleswar Quiz →</a>
+        <a class="btn-outline" href="#/sangameshwar">Next: Sangameshwar Temple →</a>
+        <a class="btn-outline" href="#/home">Back to Home</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- ═════════ SANGAMESHWAR ═════════ -->
+  <article id="page-sangameshwar" class="page" data-title="Sangameshwar Temple">
+    <header class="temple-hero">
+      <div class="temple-hero-bg" role="presentation" style="background-image:url('images/sangameshwar.jpg');"></div>
+      <div class="temple-hero-overlay"></div>
+      <div class="temple-hero-content">
+        <a class="back-btn" href="#/home">Back to Home</a>
+        <p class="temple-category">Hemadpanthi · Saswad, Pune District</p>
+        <h1 class="temple-name" tabindex="-1">Sangameshwar<br><em>Temple</em></h1>
+        <p class="temple-tagline">Lord of the Confluence, Where Rivers Meet the Divine</p>
+      </div>
+    </header>
+
+    <div class="temple-body">
+      <dl class="temple-facts" aria-label="Key facts">
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Constructed</dt>
+          <dd class="temple-fact-value">13th C CE<span class="temple-fact-sub" style="display:block">Yadava period</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Style</dt>
+          <dd class="temple-fact-value">Hemadpanthi<span class="temple-fact-sub" style="display:block">Black basalt</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Primary Deity</dt>
+          <dd class="temple-fact-value">Sangameshwar<span class="temple-fact-sub" style="display:block">Shiva of confluences</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Location</dt>
+          <dd class="temple-fact-value">Saswad<span class="temple-fact-sub" style="display:block">Near Pune, MH</span></dd>
+        </div>
+      </dl>
+
+      <div class="temple-content-grid">
+        <div class="temple-content-text">
+          <h2>History &amp; Origins</h2>
+          <p>The Sangameshwar Temple at Saswad — meaning "Lord of the Confluence" — sits at the sangama (confluence) of the Karha and Nira rivers, making it both a geographical and spiritual confluence point. The temple was constructed during the flourishing of the Yadava dynasty in the 13th century CE.</p>
+          <p>Saswad itself was an important cultural and commercial town in medieval Maharashtra, and the temple served as the spiritual anchor of the community. The Hemadpanthi construction technique used here demonstrates the same extraordinary precision seen across the Yadava architectural corpus.</p>
+
+          <blockquote class="temple-highlight-box">
+            <p>"Every Sangama — every confluence — in Indian cosmology is sacred. Here, two rivers merge, and in their meeting, Shiva himself is present."</p>
+          </blockquote>
+
+          <h2>Architectural Features</h2>
+          <p>The temple follows the classical Hemadpanthi plan: a garbhagriha (sanctum sanctorum), an antarala (vestibule), and a sabhamandapa (assembly hall), all constructed in perfectly fitted black basalt without mortar. The shikhara rises elegantly above the garbhagriha in the Nagara style.</p>
+          <p>The exterior walls carry carved panels of the Ashtadikpalas (guardians of eight directions), manifestations of Shiva, Vishnu, and the Devi, along with the standard Hemadpanthi decorative vocabulary of elephants, scrolling lotuses, and makaras (sea-creatures).</p>
+          <p>The mandapa features a beautifully carved ceiling with a central lotus medallion — a design that appears across Hemadpanthi temples and is understood as a symbolic representation of the expanding cosmos emanating from a divine centre.</p>
+
+          <h2>IKS Connections</h2>
+          <p>The temple's location at a river confluence is itself a product of deep geographical and cosmological knowledge. River confluences were identified in the Puranic tradition as tirtha-kshetras — crossing points between the human and divine worlds — and temples were sited there accordingly.</p>
+          <p>The water management systems around the temple complex — ghats, kunds (ritual tanks), and channelised inflow — reflect the integration of hydraulic engineering knowledge with sacred geography, ensuring the ritual purity and community water needs were served simultaneously.</p>
+        </div>
+
+        <figure class="temple-gallery" data-gallery>
+          <img class="temple-gallery-main" src="images/sangameshwar1.jpg" alt="Sangameshwar Temple with its tall shikhara against a blue sky" loading="lazy">
+          <div class="temple-gallery-row">
+            <button type="button" aria-label="Show this photo larger: carved stone shrine detail" aria-pressed="false"><img src="images/sangameshwar2.jpg" alt="Densely carved stone shrine with rows of small figures" loading="lazy"></button>
+            <button type="button" aria-label="Show this photo larger: Nandi in a stone shrine" aria-pressed="false"><img src="images/sangameshwar3.jpg" alt="Stone Nandi facing a shiva linga inside a small shrine" loading="lazy"></button>
+          </div>
+          <figcaption class="temple-gallery-caption">Select a thumbnail to swap it into the main view.</figcaption>
+        </figure>
+      </div>
+
+      <div class="temple-nav-btns">
+        <a class="btn-primary" href="#/quiz/sangameshwar">Take Sangameshwar Quiz →</a>
+        <a class="btn-outline" href="#/bhaja">Next: Bhaja Caves →</a>
+        <a class="btn-outline" href="#/bhuleswar">← Bhuleswar Temple</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- ═════════ BHAJA CAVES ═════════ -->
+  <article id="page-bhaja" class="page" data-title="Bhaja Caves">
+    <header class="temple-hero">
+      <div class="temple-hero-bg" role="presentation" style="background-image:url('images/bhajacaves.jpg');"></div>
+      <div class="temple-hero-overlay"></div>
+      <div class="temple-hero-content">
+        <a class="back-btn" href="#/home">Back to Home</a>
+        <p class="temple-category">Rock-cut Buddhist · Malavli, Pune District</p>
+        <h1 class="temple-name" tabindex="-1">Bhaja<br><em>Caves</em></h1>
+        <p class="temple-tagline">2,200 Years of Silence — The Earliest Buddhist Monument in Maharashtra</p>
+      </div>
+    </header>
+
+    <div class="temple-body">
+      <dl class="temple-facts" aria-label="Key facts">
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Constructed</dt>
+          <dd class="temple-fact-value">2nd C BCE<span class="temple-fact-sub" style="display:block">Early Satavahana era</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Style</dt>
+          <dd class="temple-fact-value">Rock-cut<span class="temple-fact-sub" style="display:block">Hinayana Buddhist</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Key Feature</dt>
+          <dd class="temple-fact-value">22 Caves<span class="temple-fact-sub" style="display:block">Incl. great chaitya</span></dd>
+        </div>
+        <div class="temple-fact">
+          <dt class="temple-fact-label">Location</dt>
+          <dd class="temple-fact-value">Malavli<span class="temple-fact-sub" style="display:block">Near Lonavala, MH</span></dd>
+        </div>
+      </dl>
+
+      <div class="temple-content-grid">
+        <div class="temple-content-text">
+          <h2>History &amp; Origins</h2>
+          <p>Carved into the volcanic basalt cliffs above the Bhusaval road near Lonavala, the Bhaja Caves represent one of the earliest surviving examples of rock-cut Buddhist architecture in India. Dated to approximately the 2nd century BCE, they predate even the more famous Karla Caves nearby by over a century.</p>
+          <p>The caves were excavated by the early Buddhist monastic community at a time when the Hinayana (Theravada) tradition was ascendant, and when the trade routes through the Western Ghats were being actively used — the site's elevation giving monks both seclusion and a commanding view of the ancient Konkan trade corridor below.</p>
+
+          <blockquote class="temple-highlight-box">
+            <p>"To enter Bhaja is to step into the early centuries of the common era. The chaitya arch above the entrance is one of the oldest wooden-roofed barrel vaults still intact in Asia."</p>
+          </blockquote>
+
+          <h2>Architectural Features</h2>
+          <p>The complex consists of 22 caves of varying size, the most important being the great Chaitya Hall (Cave 12) — a magnificent barrel-vaulted prayer hall 16 metres long, with a central nave flanked by rows of octagonal pillars, terminating in a solid hemispherical stupa at the apsidal end.</p>
+          <p>Remarkably, the curved wooden ribs that were set into the rock to simulate a timbered roof construction are still partially preserved — one of the few surviving examples of wooden architectural elements of this antiquity in India. This reveals the tradition of translating timber architecture into stone.</p>
+          <p>Cave 19 contains a remarkable assembly of 14 stupas, while the residential viharas (monastery caves) show the highly organised community life of early Buddhist monks.</p>
+
+          <h2>The Relief Sculptures</h2>
+          <p>Two extraordinary relief panels survive at Bhaja: one showing Surya (the sun god) riding his chariot across the sky, trampling demons underfoot; the other showing Indra on Airavata (his elephant mount), in a divine procession. These are among the earliest narrative sculptural reliefs in Maharashtra.</p>
+
+          <h2>IKS Connections</h2>
+          <p>The hydraulic engineering of Bhaja is remarkable: carved cisterns, channels, and drainage systems ensured a reliable water supply for the monastic community. The astronomical orientation of the main chaitya and the treatment of light within the cave complex suggest a sophisticated understanding of solar geometry.</p>
+        </div>
+
+        <figure class="temple-gallery" data-gallery>
+          <img class="temple-gallery-main" src="images/bhajacave1.jpg" alt="Barrel-vaulted chaitya hall with a stupa at the far end" loading="lazy">
+          <div class="temple-gallery-row">
+            <button type="button" aria-label="Show this photo larger: relief panels beside a cave doorway" aria-pressed="false"><img src="images/bhajacave2.jpg" alt="Relief sculpture panels flanking a dark cave doorway" loading="lazy"></button>
+            <button type="button" aria-label="Show this photo larger: weathered carved wall" aria-pressed="false"><img src="images/bhajacave3.jpg" alt="Weathered carved figures on a cave wall" loading="lazy"></button>
+          </div>
+          <figcaption class="temple-gallery-caption">Select a thumbnail to swap it into the main view.</figcaption>
+        </figure>
+      </div>
+
+      <div class="temple-nav-btns">
+        <a class="btn-primary" href="#/quiz/bhaja">Take Bhaja Caves Quiz →</a>
+        <a class="btn-outline" href="#/sangameshwar">← Sangameshwar Temple</a>
+        <a class="btn-outline" href="#/home">Back to Home</a>
+      </div>
+    </div>
+  </article>
+
+  <!-- ═════════ IKS ═════════ -->
+  <div id="page-iks" class="page" data-title="Indian Knowledge Systems">
+    <header class="page-intro">
+      <div class="temple-body">
+        <a class="back-btn" href="#/home">Back to Home</a>
+        <p class="section-label">Indian Knowledge Systems</p>
+        <h1 class="section-title" tabindex="-1" style="max-width:680px;">Where Stone Becomes<br><em>Living Philosophy</em></h1>
+      </div>
+    </header>
+
+    <section class="home-section" aria-label="Introduction">
+      <div class="iks-intro-grid">
+        <div>
+          <p class="section-body" style="margin-bottom:28px;">India's sacred architectural tradition is not mere building — it is a form of cosmic writing. Every temple is a three-dimensional mandala, a representation of Mount Meru, and a coded repository of Bharatiya Jnaana Parampara.</p>
+          <p class="section-body">The temples of Maharashtra — from the elaborate Hemadpanthi stone temples to the ancient Buddhist rock-cut caves — embody multiple strands of Indian Knowledge Systems: astronomy, geometry, philosophy, metallurgy, hydraulics, and iconographic theology.</p>
+          <blockquote class="temple-highlight-box wide">
+            <p>"The temple is not built to house a deity — the temple is the deity. The shikhara is Meru, the garbhagriha is the cave of the heart."</p>
+          </blockquote>
+        </div>
+        <figure>
+          <img class="iks-photo" src="images/iksmainpage.jpg" alt="A small stone temple with a shikhara and a carved chariot wheel at sunset" loading="lazy">
+          <figcaption class="iks-caption">Where stone, geometry, and spirit converge — a living embodiment of Indian Knowledge Systems.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <div class="divider" role="presentation"></div>
+
+    <section class="home-section" aria-labelledby="streams-title">
+      <p class="section-label">The Six Streams</p>
+      <h2 class="section-title" id="streams-title">Knowledge Traditions<br>in <em>Stone</em></h2>
+      <ul class="iks-streams-grid">
+        <li class="iks-stream-card">
+          <div class="iks-stream-icon" aria-hidden="true">🏛</div>
+          <h3 class="iks-stream-title">Vastu Shastra</h3>
+          <p class="iks-stream-text">The science of spatial harmony. Temple plans are derived from the Vastu Purusha Mandala — a cosmic grid of 81 or 64 squares that maps the human body, celestial forces, and earthly space simultaneously.</p>
+        </li>
+        <li class="iks-stream-card">
+          <div class="iks-stream-icon" aria-hidden="true">📿</div>
+          <h3 class="iks-stream-title">Agama Vidya</h3>
+          <p class="iks-stream-text">Ritual manuals that govern every aspect of temple life — from the consecration of the foundation stone to the daily ceremonial schedule. Shaiva Agamas inform the Shiva temples of Maharashtra profoundly.</p>
+        </li>
+        <li class="iks-stream-card">
+          <div class="iks-stream-icon" aria-hidden="true">⭐</div>
+          <h3 class="iks-stream-title">Jyotisha Shastra</h3>
+          <p class="iks-stream-text">Temple entrances are often oriented to receive the sun's first ray on the deity's face during the dawn of auspicious solar events. This solar programming is a form of astronomical inscription in stone.</p>
+        </li>
+        <li class="iks-stream-card">
+          <div class="iks-stream-icon" aria-hidden="true">🪨</div>
+          <h3 class="iks-stream-title">Shilpa Shastra</h3>
+          <p class="iks-stream-text">Canonical texts like the Manasara and Mayamata prescribe ideal proportions for every sculptural type. A craftsman was both artist and priest — the act of carving was itself a form of worship.</p>
+        </li>
+        <li class="iks-stream-card">
+          <div class="iks-stream-icon" aria-hidden="true">🌸</div>
+          <h3 class="iks-stream-title">Yoga &amp; Tantra</h3>
+          <p class="iks-stream-text">The vertical axis of the temple mirrors the sushumna nadi of the subtle body. The pilgrimage from gopura to garbhagriha re-enacts the journey of consciousness from the outer to the innermost.</p>
+        </li>
+        <li class="iks-stream-card">
+          <div class="iks-stream-icon" aria-hidden="true">💧</div>
+          <h3 class="iks-stream-title">Hydraulic Engineering</h3>
+          <p class="iks-stream-text">Temple tank systems and step-well networks encoded within temple complexes demonstrate mastery of watershed management, groundwater recharge, and community water sovereignty.</p>
+        </li>
+      </ul>
+    </section>
+
+    <section class="quiz-cta-section" aria-labelledby="iks-cta-title">
+      <div class="quiz-cta-inner">
+        <h2 class="quiz-cta-title" id="iks-cta-title">Ready to Test<br><em>Your Knowledge?</em></h2>
+        <p class="quiz-cta-sub">Explore our temple quizzes and discover how much you know about these ancient knowledge traditions.</p>
+        <a class="btn-primary" href="#/quizzes">Take a Quiz →</a>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═════════ ABOUT ═════════ -->
+  <div id="page-about" class="page" data-title="About">
+    <header class="page-intro">
+      <div class="temple-body">
+        <a class="back-btn" href="#/home">Back to Home</a>
+        <p class="section-label">About</p>
+        <h1 class="section-title" tabindex="-1">Archiving the<br><em>Sacred Legacy</em></h1>
+      </div>
+    </header>
+
+    <section class="home-section" aria-label="Our mission">
+      <div class="about-page-grid">
+        <div>
+          <div class="about-mission">
+            <blockquote class="about-mission-text">
+              "We are dedicated to preserving and sharing the extraordinary cultural heritage of Maharashtra through the lens of Indian Knowledge Systems — because to lose a temple is to lose a library."
+            </blockquote>
+            <ul class="mission-points">
+              <li>High-resolution photographic and LiDAR documentation of heritage structures</li>
+              <li>Scholarly annotation of iconographic programmes and architectural grammars</li>
+              <li>Public digital archive with open access for researchers and students</li>
+              <li>Community engagement through interactive educational tools and quizzes</li>
+              <li>Advocacy for heritage protection and responsible conservation</li>
+            </ul>
+          </div>
+          <div class="button-row spaced">
+            <a class="btn-primary" href="#/quizzes">Explore Quizzes</a>
+            <a class="btn-outline" href="#/bhuleswar">View Temples</a>
+          </div>
+        </div>
+        <div class="about-copy">
+          <p class="section-label">Our Mission</p>
+          <h2>Why Digital Sovereignty Matters</h2>
+          <p>Maharashtra's temple heritage sits at the crossroads of multiple living traditions — Shaiva, Vaishnava, Buddhist, and Jain — and represents millennia of accumulated artistic, philosophical, and scientific knowledge.</p>
+          <p>Yet this knowledge is scattered across vernacular texts, oral traditions, and stone carvings that few have the training to read. Our mission is to decode, document, and disseminate this heritage in accessible digital form.</p>
+          <p>The goal is not mere preservation as artifact — it is the revivification of these knowledge systems as living, applicable wisdom for contemporary India.</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider" role="presentation"></div>
+
+    <section class="home-section" aria-labelledby="about-effort-title">
+      <p class="section-label">What We Do</p>
+      <h2 class="section-title" id="about-effort-title">The Archival<br><em>Effort</em></h2>
+      <ul class="effort-grid">
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">📷</div>
+          <h3 class="effort-card-title">Photography</h3>
+          <p class="effort-card-text">High-resolution documentation of every carved surface and architectural element</p>
+        </li>
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">🗺</div>
+          <h3 class="effort-card-title">Mapping</h3>
+          <p class="effort-card-text">Precise architectural surveys and plan drawings with iconographic annotations</p>
+        </li>
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">📚</div>
+          <h3 class="effort-card-title">Research</h3>
+          <p class="effort-card-text">Connecting stone inscriptions and sculptural themes to textual knowledge traditions</p>
+        </li>
+        <li class="effort-card">
+          <div class="effort-card-icon" aria-hidden="true">🎓</div>
+          <h3 class="effort-card-title">Education</h3>
+          <p class="effort-card-text">Interactive digital tools, quizzes, and learning experiences for all ages</p>
+        </li>
+      </ul>
+    </section>
+  </div>
+
+  <!-- ═════════ QUIZ SELECTION ═════════ -->
+  <div id="page-quizzes" class="page quiz-select-page" data-title="Quizzes">
+    <header class="quiz-select-header">
+      <a class="back-btn" href="#/home">Back to Home</a>
+      <p class="section-label">Assessment</p>
+      <h1 class="section-title" tabindex="-1">Let's Test Your<br><em>Knowledge!</em></h1>
+      <p class="section-body">Choose a temple to begin your knowledge assessment. Each quiz contains 5 carefully curated questions about architecture, history, and Indian Knowledge Systems.</p>
+    </header>
+
+    <div class="quiz-cards-grid">
+      <a class="quiz-card" href="#/quiz/bhuleswar">
+        <img src="images/bhuleshwar.jpg" alt="Bhuleswar Temple walls and towers" loading="lazy">
+        <div class="quiz-card-overlay">
+          <span class="quiz-card-num" aria-hidden="true">01</span>
+          <p class="quiz-card-tag">Quiz · 5 Questions</p>
+          <h2 class="quiz-card-title">Bhuleswar Temple</h2>
+          <p class="quiz-card-meta">Architecture, History &amp; IKS</p>
+          <span class="btn-small">Begin Quiz →</span>
+        </div>
+      </a>
+      <a class="quiz-card" href="#/quiz/sangameshwar">
+        <img src="images/sangameshwar.jpg" alt="Sangameshwar Temple at Saswad" loading="lazy">
+        <div class="quiz-card-overlay">
+          <span class="quiz-card-num" aria-hidden="true">02</span>
+          <p class="quiz-card-tag">Quiz · 5 Questions</p>
+          <h2 class="quiz-card-title">Sangameshwar Temple</h2>
+          <p class="quiz-card-meta">Architecture, History &amp; IKS</p>
+          <span class="btn-small">Begin Quiz →</span>
+        </div>
+      </a>
+      <a class="quiz-card" href="#/quiz/bhaja">
+        <img src="images/bhajacaves.jpg" alt="Rock-cut facades at Bhaja Caves" loading="lazy">
+        <div class="quiz-card-overlay">
+          <span class="quiz-card-num" aria-hidden="true">03</span>
+          <p class="quiz-card-tag">Quiz · 5 Questions</p>
+          <h2 class="quiz-card-title">Bhaja Caves</h2>
+          <p class="quiz-card-meta">Architecture, History &amp; IKS</p>
+          <span class="btn-small">Begin Quiz →</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- ═════════ QUIZ ═════════ -->
+  <div id="page-quiz" class="page" data-title="Quiz">
+    <div class="quiz-page">
+      <div class="quiz-header">
+        <a class="back-btn" href="#/quizzes">Back to Quizzes</a>
+        <div class="quiz-progress-bar-wrap" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="quiz-progress-wrap">
+          <div class="quiz-progress-bar" id="quiz-progress"></div>
+        </div>
+        <div class="quiz-meta">
+          <h1 class="quiz-temple-tag" id="quiz-temple-tag" tabindex="-1">Bhuleswar Temple</h1>
+          <p class="quiz-counter">Question <span id="quiz-q-num">1</span> of <span id="quiz-q-total">5</span></p>
+        </div>
+      </div>
+
+      <div class="quiz-question-area">
+        <div class="quiz-q-left">
+          <p class="quiz-q-number" id="quiz-q-number" aria-hidden="true">01</p>
+          <h2 class="quiz-question-text" id="quiz-question-text">Loading question…</h2>
+          <div class="quiz-options" id="quiz-options" role="group" aria-labelledby="quiz-question-text"></div>
+          <p class="quiz-hint">Tip: press A, B, C or D on your keyboard to answer.</p>
+        </div>
+        <div class="quiz-q-right">
+          <div class="quiz-img-wrap">
+            <img id="quiz-img" src="images/bhuleshwarquiz.jpg" alt="">
+          </div>
+          <div class="quiz-explanation" id="quiz-explanation">
+            <h3 class="quiz-explanation-title">Explanation</h3>
+            <p class="quiz-explanation-text" id="quiz-explanation-text"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-btn-row">
+        <p class="quiz-feedback" id="quiz-feedback" role="status" aria-live="polite"></p>
+        <button class="btn-primary" id="quiz-next-btn" type="button" hidden>Next Question →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═════════ RESULT ═════════ -->
+  <div id="page-result" class="page" data-title="Quiz Results">
+    <div class="assessment-page">
+      <div class="assessment-inner">
+        <p class="section-label" style="justify-content:center;">Assessment Concluded</p>
+        <div class="assessment-score-wrap">
+          <p class="assessment-score" id="result-score" aria-label="Your score">0</p>
+          <p class="assessment-score-denom">out of <span id="result-total">5</span></p>
+        </div>
+        <h1 class="assessment-title" id="result-title" tabindex="-1">Excellent!</h1>
+        <p class="assessment-subtitle" id="result-sub"></p>
+        <div class="assessment-breakdown" id="result-breakdown"></div>
+        <p class="save-notice" id="save-notice" role="status"></p>
+        <div class="assessment-btns">
+          <button class="btn-primary" id="result-retry-btn" type="button">Retry Quiz</button>
+          <a class="btn-outline" href="#/quizzes">All Quizzes</a>
+          <a class="btn-outline" href="#/home">Home</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═════════ FOOTER ═════════ -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <p class="footer-brand-name">Maharashtra Heritage</p>
+      <p class="footer-brand-text">Dedicated to the preservation and digital documentation of Maharashtra's extraordinary temple architecture and Indian Knowledge Systems traditions.</p>
+    </div>
+    <nav aria-label="Temples">
+      <p class="footer-col-title">Temples</p>
+      <ul class="footer-links">
+        <li><a href="#/bhuleswar">Bhuleswar Temple</a></li>
+        <li><a href="#/sangameshwar">Sangameshwar Temple</a></li>
+        <li><a href="#/bhaja">Bhaja Caves</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Knowledge">
+      <p class="footer-col-title">Knowledge</p>
+      <ul class="footer-links">
+        <li><a href="#/iks">IKS Overview</a></li>
+        <li><a href="#/about">About the Project</a></li>
+        <li><a href="#/quizzes">Take a Quiz</a></li>
+      </ul>
+    </nav>
+    <nav aria-label="Quizzes">
+      <p class="footer-col-title">Quizzes</p>
+      <ul class="footer-links">
+        <li><a href="#/quiz/bhuleswar">Bhuleswar Quiz</a></li>
+        <li><a href="#/quiz/sangameshwar">Sangameshwar Quiz</a></li>
+        <li><a href="#/quiz/bhaja">Bhaja Caves Quiz</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div class="footer-bottom">
+    <p class="footer-copy">© <span id="year">2026</span> Maharashtra Heritage · All rights reserved</p>
+    <p class="footer-copy">Pune, Maharashtra, India</p>
+  </div>
+</footer>
+
+<script src="js/quiz-data.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
