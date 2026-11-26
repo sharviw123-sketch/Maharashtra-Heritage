@@ -10,7 +10,7 @@
 const quizData = {
   bhuleswar: {
     name: 'Bhuleswar Temple',
-    img: "images/bhuleshwarquiz.jpg",
+    img: "bhuleshwarquiz.jpg",
     alt: "Carved pillars lit by sunlight inside the Bhuleswar Temple",
     questions: [
       { q: 'What material is primarily used in the construction of Bhuleswar Temple?', opts: ['Red sandstone','Black basalt','White marble','Terracotta bricks'], ans: 1, exp: 'Bhuleswar Temple is built using precisely cut black basalt stones — the volcanic rock abundant across the Deccan Plateau. The Hemadpanthi technique fits these stones without mortar.' },
@@ -22,7 +22,7 @@ const quizData = {
   },
   sangameshwar: {
     name: 'Sangameshwar Temple',
-    img: "images/sangameshwar1.jpg",
+    img: "sangameshwar1.jpg",
     alt: "Sangameshwar Temple with its tall shikhara",
     questions: [
       { q: 'What does the name "Sangameshwar" literally mean?', opts: ['Lord of the Mountains','Lord of the Confluence','Lord of the Rivers','Lord of Stone'], ans: 1, exp: 'Sangameshwar translates as "Lord (Ishwara) of the Confluence (Sangama)" — a Shiva form specifically worshipped at river meeting points, which were considered sacred tirthas.' },
@@ -34,7 +34,7 @@ const quizData = {
   },
   bhaja: {
     name: 'Bhaja Caves',
-    img: "images/bhajacavequiz.jpg",
+    img: "bhajacavequiz.jpg",
     alt: "Barrel-vaulted chaitya hall at Bhaja Caves",
     questions: [
       { q: 'Approximately when were the Bhaja Caves constructed?', opts: ['5th century CE','1st century CE','2nd century BCE','7th century BCE'], ans: 2, exp: 'The Bhaja Caves are dated to approximately the 2nd century BCE, making them among the earliest surviving rock-cut Buddhist monuments in India.' },
