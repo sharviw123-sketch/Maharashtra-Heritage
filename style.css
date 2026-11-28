@@ -223,7 +223,7 @@ img { max-width:100%; }
 }
 .hero-bg {
   position:absolute; inset:0;
-  background:url('../images/herosection.jpg') center/cover;
+  background:url('herosection.jpg') center/cover;
   filter:brightness(.22) sepia(.3);
   transform:scale(1.05);
   animation:heroZoom 20s ease-in-out infinite alternate;
